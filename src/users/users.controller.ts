@@ -6,8 +6,11 @@ import {
   Patch,
   Post,
   Delete,
+  ParseIntPipe,
+  ValidationPipe
 } from '@nestjs/common';
 import { UsersService } from './users.service';
+import { CreateUserDto, UpdateUserDto } from './DTO';
 
 @Controller('users')
 export class UsersController {
@@ -19,21 +22,21 @@ export class UsersController {
   }
 
   @Get(':id') //GET /users:id
-  findById(@Param('id') id: string) {
-    return this.userService.findById(+id); //unary plus convert string to number
+  findById(@Param('id', ParseIntPipe) id: number) {
+    return this.userService.findById(id); //unary plus convert string to number
   }
 
   @Post() //POST /users
-  create(@Body() user: { name: string; email: string }) {
-    return this.userService.create(user);
+  create(@Body(ValidationPipe) createUserDto: CreateUserDto) {
+    return this.userService.create(createUserDto);
   }
 
   @Patch(':id') //PATCH /users/:id
   findOneAndUpdate(
-    @Param('id') id: string,
-    @Body() userUpdate: { name?: string; email?: string },
+    @Param('id', ParseIntPipe) id: number,
+    @Body(ValidationPipe) updateUserDto: UpdateUserDto,
   ) {
-    return this.userService.update(+id, userUpdate);
+    return this.userService.update(id, updateUserDto);
   }
 
   @Delete(':id') //DELETE /users:id
